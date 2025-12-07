@@ -19,36 +19,12 @@ pipeline {
             }
         }
 
-        stage('Start Services with Docker Compose') {
-            steps {
-                echo '========== Starting MongoDB, Backend, and Frontend with Docker Compose =========='
-                sh '''
-                    docker compose up -d
-                    sleep 10
-                    echo "========== Services started successfully =========="
-                    docker compose ps
-                '''
-            }
-        }
-
-        stage('Build Docker Test Image') {
-            steps {
-                echo '========== Building Docker Test Image =========='
-                sh '''
-                    docker build -f Dockerfile -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
-                    echo "========== Docker test image built successfully =========="
-                '''
-            }
-        }
-
         stage('Run Selenium Tests') {
             steps {
-                echo '========== Running Selenium Tests =========='
+                echo '========== Running Selenium Tests with Maven =========='
                 sh '''
-                    docker run --rm \
-                        --network host \
-                        -v /var/run/docker.sock:/var/run/docker.sock \
-                        ${DOCKER_IMAGE}:${DOCKER_TAG}
+                    cd selenium-tests
+                    mvn clean test
                     echo "========== Tests executed successfully =========="
                 '''
             }
@@ -70,12 +46,7 @@ pipeline {
 
         stage('Cleanup') {
             steps {
-                echo '========== Stopping and removing Docker Compose services =========='
-                sh '''
-                    docker compose down || true
-                    docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true
-                    echo "========== Cleanup completed =========="
-                '''
+                echo '========== Cleanup completed =========='
             }
         }
     }
