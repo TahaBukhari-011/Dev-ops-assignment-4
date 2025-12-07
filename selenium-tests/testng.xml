@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="MERN Auth App Test Suite" verbose="2" thread-count="1">
+    <test name="MERN Auth Tests">
+        <classes>
+            <class name="com.mernauth.tests.MernAuthAppTest">
+                <methods>
+                    <include name="testHomePageDisplayed" />
+                    <include name="testSignInButtonNavigation" />
+                    <include name="testSignUpButtonNavigation" />
+                    <include name="testSignUpPageFields" />
+                    <include name="testSignInPageFields" />
+                    <include name="testSignInWithInvalidCredentials" />
+                    <include name="testSignUpWithMismatchedPasswords" />
+                    <include name="testSignUpWithShortPassword" />
+                    <include name="testSignInPageHasSignUpLink" />
+                    <include name="testSignUpPageHasSignInLink" />
+                    <include name="testSignInPageTitle" />
+                    <include name="testSignUpPageTitle" />
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>
