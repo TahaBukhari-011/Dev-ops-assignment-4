@@ -68,9 +68,42 @@ pipeline {
         }
         success {
             echo '========== Pipeline successful =========='
+            emailext(
+                subject: "✅ Jenkins Build #${BUILD_NUMBER} - MERN Auth Tests PASSED",
+                body: '''
+                    <h2>Build Successful!</h2>
+                    <p><b>Project:</b> MERN Auth Application</p>
+                    <p><b>Build Number:</b> ${BUILD_NUMBER}</p>
+                    <p><b>Build Status:</b> SUCCESS</p>
+                    <p><b>Build URL:</b> ${BUILD_URL}</p>
+                    <hr/>
+                    <h3>Test Results:</h3>
+                    <p>All Selenium tests have been executed successfully!</p>
+                    <p><b>Console Output:</b></p>
+                    <pre>${BUILD_LOG}</pre>
+                ''',
+                to: 'tahabukhari313@gmail.com',
+                mimeType: 'text/html'
+            )
         }
         failure {
             echo '========== Pipeline failed =========='
+            emailext(
+                subject: "❌ Jenkins Build #${BUILD_NUMBER} - MERN Auth Tests FAILED",
+                body: '''
+                    <h2>Build Failed!</h2>
+                    <p><b>Project:</b> MERN Auth Application</p>
+                    <p><b>Build Number:</b> ${BUILD_NUMBER}</p>
+                    <p><b>Build Status:</b> FAILURE</p>
+                    <p><b>Build URL:</b> ${BUILD_URL}</p>
+                    <hr/>
+                    <p>Please check the console output for details.</p>
+                    <p><b>Console Output:</b></p>
+                    <pre>${BUILD_LOG}</pre>
+                ''',
+                to: 'tahabukhari313@gmail.com',
+                mimeType: 'text/html'
+            )
         }
     }
 }
