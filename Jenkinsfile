@@ -23,10 +23,10 @@ pipeline {
             steps {
                 echo '========== Starting MongoDB, Backend, and Frontend with Docker Compose =========='
                 sh '''
-                    docker-compose up -d
+                    docker compose up -d
                     sleep 10
                     echo "========== Services started successfully =========="
-                    docker-compose ps
+                    docker compose ps
                 '''
             }
         }
@@ -72,7 +72,7 @@ pipeline {
             steps {
                 echo '========== Stopping and removing Docker Compose services =========='
                 sh '''
-                    docker-compose down || true
+                    docker compose down || true
                     docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true
                     echo "========== Cleanup completed =========="
                 '''
