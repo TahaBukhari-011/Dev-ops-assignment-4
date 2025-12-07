@@ -7,7 +7,7 @@ pipeline {
         DOCKER_TAG = "${BUILD_NUMBER}"
         BACKEND_URL = 'http://localhost:5000'
         FRONTEND_URL = 'http://localhost:3000'
-        MONGODB_URI = credentials('mongodb-uri')
+        MONGODB_URI = 'mongodb://localhost:27017/mern-auth'
     }
 
     stages {
@@ -110,17 +110,12 @@ pipeline {
     post {
         always {
             echo '========== Pipeline execution completed =========='
-            cleanWs()
         }
         success {
             echo '========== Pipeline successful =========='
-            // Send success notification
-            sh 'echo "All tests passed successfully!"'
         }
         failure {
             echo '========== Pipeline failed =========='
-            // Send failure notification
-            sh 'echo "Tests failed. Please check the logs."'
         }
     }
 }
