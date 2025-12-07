@@ -35,7 +35,6 @@ pipeline {
                 sh '''
                     docker run --rm \
                         -v /var/run/docker.sock:/var/run/docker.sock \
-                        -v $(pwd)/selenium-tests:/app/selenium-tests \
                         ${DOCKER_IMAGE}:${DOCKER_TAG}
                     echo "========== Tests executed successfully =========="
                 '''
