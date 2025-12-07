@@ -19,65 +19,38 @@ pipeline {
             }
         }
 
-        stage('Build Backend') {
+        stage('Start Services with Docker Compose') {
             steps {
-                echo '========== Building Backend =========='
-                dir('backend') {
-                    sh 'npm install'
-                    echo '========== Backend dependencies installed =========='
-                }
-            }
-        }
-
-        stage('Build Frontend') {
-            steps {
-                echo '========== Building Frontend =========='
-                dir('frontend') {
-                    sh 'npm install'
-                    echo '========== Frontend dependencies installed =========='
-                }
-            }
-        }
-
-        stage('Start Services') {
-            steps {
-                echo '========== Starting Backend and Frontend Services =========='
+                echo '========== Starting MongoDB, Backend, and Frontend with Docker Compose =========='
                 sh '''
-                    cd backend && npm start &
-                    sleep 5
-                    echo "Backend started"
-                    cd ../frontend && npm start &
-                    sleep 5
-                    echo "Frontend started"
+                    docker-compose up -d
+                    sleep 10
+                    echo "========== Services started successfully =========="
+                    docker-compose ps
                 '''
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build Docker Test Image') {
             steps {
-                echo '========== Building Docker Image =========='
-                script {
-                    sh '''
-                        docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
-                        docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest
-                        echo "========== Docker image built successfully =========="
-                    '''
-                }
+                echo '========== Building Docker Test Image =========='
+                sh '''
+                    docker build -f Dockerfile -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
+                    echo "========== Docker test image built successfully =========="
+                '''
             }
         }
 
-        stage('Test') {
+        stage('Run Selenium Tests') {
             steps {
-                echo '========== Running Selenium Tests in Docker =========='
-                script {
-                    sh '''
-                        docker run --rm \
-                            --network host \
-                            -v /var/run/docker.sock:/var/run/docker.sock \
-                            ${DOCKER_IMAGE}:${DOCKER_TAG}
-                        echo "========== Tests executed successfully =========="
-                    '''
-                }
+                echo '========== Running Selenium Tests =========='
+                sh '''
+                    docker run --rm \
+                        --network host \
+                        -v /var/run/docker.sock:/var/run/docker.sock \
+                        ${DOCKER_IMAGE}:${DOCKER_TAG}
+                    echo "========== Tests executed successfully =========="
+                '''
             }
         }
 
@@ -97,9 +70,9 @@ pipeline {
 
         stage('Cleanup') {
             steps {
-                echo '========== Cleaning up =========='
+                echo '========== Stopping and removing Docker Compose services =========='
                 sh '''
-                    pkill -f "npm start" || true
+                    docker-compose down || true
                     docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true
                     echo "========== Cleanup completed =========="
                 '''
