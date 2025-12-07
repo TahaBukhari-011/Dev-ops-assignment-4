@@ -19,12 +19,24 @@ pipeline {
             }
         }
 
+        stage('Build Docker Test Image') {
+            steps {
+                echo '========== Building Docker Test Image =========='
+                sh '''
+                    docker build -f Dockerfile -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
+                    echo "========== Docker test image built successfully =========="
+                '''
+            }
+        }
+
         stage('Run Selenium Tests') {
             steps {
-                echo '========== Running Selenium Tests with Maven =========='
+                echo '========== Running Selenium Tests in Docker =========='
                 sh '''
-                    cd selenium-tests
-                    mvn clean test
+                    docker run --rm \
+                        -v /var/run/docker.sock:/var/run/docker.sock \
+                        -v $(pwd)/selenium-tests:/app/selenium-tests \
+                        ${DOCKER_IMAGE}:${DOCKER_TAG}
                     echo "========== Tests executed successfully =========="
                 '''
             }
@@ -36,7 +48,7 @@ pipeline {
                 sh '''
                     if [ -d "selenium-tests/target/surefire-reports" ]; then
                         echo "Test reports found"
-                        ls -la selenium-tests/target/surefire-reports/ || true
+                        ls -la selenium-tests/target/surefire-reports/
                     else
                         echo "No test reports directory found"
                     fi
